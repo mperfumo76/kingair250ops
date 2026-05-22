@@ -352,7 +352,12 @@ elif menu == "✈️ Aeronave":
 
     st.divider()
 
-    st.subheader("🛩️ Estado de sistemas")
+    st.subheader("🧭 System Status Overview")
+
+    # Separación visual por estado
+    criticos_list = []
+    warning_list = []
+    ok_list = []
 
     for _, fila in df_avion.iterrows():
 
@@ -361,7 +366,7 @@ elif menu == "✈️ Aeronave":
         f_vence = fila["Fecha Vence"]
         h_vence = fila["Horas Vence"]
 
-        alertas = []
+        estado = "ok"
         detalles = []
 
         if tipo in ["Fecha", "Mixto"] and pd.notnull(f_vence):
@@ -370,9 +375,9 @@ elif menu == "✈️ Aeronave":
             detalles.append(f"📅 {f_vence.strftime('%d/%m/%Y')}")
 
             if dias <= 0:
-                alertas.append("critico")
-            elif dias <= 30:
-                alertas.append("warning")
+                estado = "critico"
+            elif dias <= 30 and estado != "critico":
+                estado = "warning"
 
         if tipo in ["Horas", "Mixto"] and pd.notnull(h_vence):
 
@@ -380,17 +385,39 @@ elif menu == "✈️ Aeronave":
             detalles.append(f"⏱️ {int(restantes)} hs restantes")
 
             if restantes <= 0:
-                alertas.append("critico")
-            elif restantes <= 25:
-                alertas.append("warning")
+                estado = "critico"
+            elif restantes <= 25 and estado != "critico":
+                estado = "warning"
 
         texto = f"{item} — " + " | ".join(detalles)
 
-        if "critico" in alertas:
-            st.error(f"🔴 {texto}")
-
-        elif "warning" in alertas:
-            st.warning(f"🟡 {texto}")
-
+        if estado == "critico":
+            criticos_list.append(texto)
+        elif estado == "warning":
+            warning_list.append(texto)
         else:
-            st.success(f"🟢 {texto}")
+            ok_list.append(texto)
+
+    # =========================
+    # CRÍTICOS
+    # =========================
+    if criticos_list:
+        st.error("🔴 CRÍTICOS")
+        for i in criticos_list:
+            st.write(i)
+
+    # =========================
+    # WARNING
+    # =========================
+    if warning_list:
+        st.warning("🟡 PRÓXIMOS A VENCER")
+        for i in warning_list:
+            st.write(i)
+
+    # =========================
+    # OK
+    # =========================
+    if ok_list:
+        st.success("🟢 EN ESTADO OK")
+        for i in ok_list:
+            st.write(i)
