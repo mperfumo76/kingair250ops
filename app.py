@@ -342,67 +342,28 @@ with tab1:
 # AVION
 # ======================================================
 
-with tab2:
+elif menu == "✈️ Aeronave":
 
-    for _, fila in df_avion.iterrows():
+    st.title("✈️ Aeronave")
 
-        item = fila["Item"]
+    col1, col2, col3 = st.columns(3)
 
-        tipo = fila["Tipo Vencimiento"]
+    with col1:
+        st.markdown("### ✈️ Aeronave")
+        st.markdown("## King Air 250")
 
-        f_vence = fila["Fecha Vence"]
+    with col2:
+        st.metric("⏱️ Horas Totales", f"{HORAS_ACTUALES_AVION:.1f}")
 
-        h_vence = fila["Horas Vence"]
+    with col3:
+        st.metric("🔴 Ítems críticos", criticos)
 
-        alertas = []
+    st.divider()
 
-        detalles = []
+    st.subheader("📋 Estado técnico")
 
-        if tipo in ["Fecha", "Mixto"] and pd.notnull(f_vence):
-
-            dias = (f_vence - hoy).days
-
-            detalles.append(
-                f"Fecha: {f_vence.strftime('%d/%m/%Y')}"
-            )
-
-            if dias <= 0:
-                alertas.append("critico")
-
-            elif dias <= 30:
-                alertas.append("warning")
-
-        if tipo in ["Horas", "Mixto"] and pd.notnull(h_vence):
-
-            restantes = h_vence - HORAS_ACTUALES_AVION
-
-            detalles.append(
-                f"Límite: {int(h_vence)} hs "
-                f"(Restan {int(restantes)} hs)"
-            )
-
-            if restantes <= 0:
-                alertas.append("critico")
-
-            elif restantes <= 25:
-                alertas.append("warning")
-
-        texto = f"{item} — " + " | ".join(detalles)
-
-        if "critico" in alertas:
-
-            st.error(
-                f"🔴 {texto}"
-            )
-
-        elif "warning" in alertas:
-
-            st.warning(
-                f"🟡 {texto}"
-            )
-
-        else:
-
-            st.success(
-                f"🟢 {texto}"
-            )
+    st.dataframe(
+        df_avion,
+        use_container_width=True,
+        hide_index=True
+    )
