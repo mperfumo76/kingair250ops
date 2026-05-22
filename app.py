@@ -267,18 +267,30 @@ for _, fila in df_avion.iterrows():
 
 if menu == "🏠 Dashboard":
 
+    st.title("✈️ Operational Dashboard")
+
     c1, c2, c3, c4 = st.columns(4)
 
     c1.metric("✈️ Aeronave", "King Air 250")
-    c2.metric("⏱️ Horas", f"{HORAS_ACTUALES_AVION:.1f}")
+    c2.metric("⏱️ Horas Totales", f"{HORAS_ACTUALES_AVION:.1f}")
     c3.metric("🔴 Críticos", criticos)
     c4.metric("🟢 Vigentes", vigentes)
 
     st.divider()
 
-    st.subheader("📊 Resumen Operacional")
-    st.info("Estado general del sistema aeronáutico")
+    colA, colB = st.columns(2)
 
+    with colA:
+        st.subheader("📊 Estado General")
+        st.info("Sistema operativo de vencimientos activo")
+
+    with colB:
+        st.subheader("⚠️ Alertas rápidas")
+
+        if criticos > 0:
+            st.error(f"{criticos} ítems críticos requieren atención")
+        else:
+            st.success("Sin ítems críticos")
 
 # ======================================================
 # 2. PILOTOS
