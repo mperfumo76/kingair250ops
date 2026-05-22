@@ -456,11 +456,11 @@ elif menu == "✈️ Aeronave":
 
     def render_event(e):
 
-    colors = {
-        "OVERDUE": "#ff4b4b",
-        "DUE SOON": "#ffa500",
-        "OK": "#2ecc71"
-    }
+          colors = {
+             "OVERDUE": "#ff4b4b",
+             "DUE SOON": "#ffa500",
+             "OK": "#2ecc71"
+          }
 
     st.markdown(
         f"""
