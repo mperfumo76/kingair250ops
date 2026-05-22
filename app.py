@@ -472,7 +472,7 @@ elif menu == "✈️ Aeronave":
             margin-bottom:10px;
         ">
 
-            <div style="font-size:15px; font-weight:600; color:white;">
+            <div style="font-size:15px; font-weight:600;">
                 {e['item']}
             </div>
 
