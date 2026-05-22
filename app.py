@@ -262,7 +262,7 @@ for _, fila in df_avion.iterrows():
         vigentes += 1
 
 # ======================================================
-# METRICAS
+# 1. DASHBOARD
 # ======================================================
 
 if menu == "🏠 Dashboard":
@@ -279,8 +279,9 @@ if menu == "🏠 Dashboard":
     st.subheader("📊 Resumen Operacional")
     st.info("Estado general del sistema aeronáutico")
 
+
 # ======================================================
-# 👨‍✈️ PILOTOS
+# 2. PILOTOS
 # ======================================================
 
 elif menu == "👨‍✈️ Pilotos":
@@ -314,8 +315,10 @@ elif menu == "👨‍✈️ Pilotos":
 
                 else:
                     st.success(f"{documento} → OK")
+
+
 # ======================================================
-# AVION
+# 3. AERONAVE
 # ======================================================
 
 elif menu == "✈️ Aeronave":
