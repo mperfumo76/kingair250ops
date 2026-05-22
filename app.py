@@ -345,7 +345,7 @@ elif menu == "👨‍✈️ Pilotos":
 elif menu == "✈️ Aeronave":
 
     st.title("✈️ Aircraft Systems")
-    st.caption("Operational Status Dashboard - King Air 250")
+    st.caption("Operational Cockpit View - King Air 250")
 
     col1, col2, col3 = st.columns(3)
 
@@ -356,22 +356,12 @@ elif menu == "✈️ Aeronave":
     st.divider()
 
     # ======================================================
-    # 🧭 1. SYSTEM OVERVIEW
+    # 🧠 1. PROCESAMIENTO ÚNICO (DATA SOURCE)
     # ======================================================
 
-    st.subheader("🧭 1. System Overview")
-
-    st.info("Monitoring activo de todos los sistemas de la aeronave")
-
-    st.divider()
-
-    # ======================================================
-    # 🔴 2. CRITICAL ITEMS
-    # ======================================================
-
-    st.subheader("🔴 2. Critical Items")
-
-    hay_criticos = False
+    criticos_list = []
+    warning_list = []
+    ok_list = []
 
     for _, fila in df_avion.iterrows():
 
@@ -406,100 +396,48 @@ elif menu == "✈️ Aeronave":
         texto = f"{item} — " + " | ".join(detalles)
 
         if estado == "critico":
-            st.error(f"🔴 {texto}")
-            hay_criticos = True
+            criticos_list.append(texto)
 
-    if not hay_criticos:
-        st.success("No critical items")
+        elif estado == "warning":
+            warning_list.append(texto)
+
+        else:
+            ok_list.append(texto)
+
+    # ======================================================
+    # 🔴 2. CRITICAL SYSTEMS
+    # ======================================================
+
+    st.subheader("🔴 Critical Systems")
+
+    if criticos_list:
+        for i in criticos_list:
+            st.error(i)
+    else:
+        st.success("No critical systems")
 
     st.divider()
 
     # ======================================================
-    # 🟡 3. WARNING ITEMS
+    # 🟡 3. WARNING SYSTEMS
     # ======================================================
 
-    st.subheader("🟡 3. Warning Items")
+    st.subheader("🟡 Warning Systems")
 
-    hay_warning = False
-
-    for _, fila in df_avion.iterrows():
-
-        item = fila["Item"]
-        tipo = fila["Tipo Vencimiento"]
-        f_vence = fila["Fecha Vence"]
-        h_vence = fila["Horas Vence"]
-
-        estado = "ok"
-        detalles = []
-
-        if tipo in ["Fecha", "Mixto"] and pd.notnull(f_vence):
-
-            dias = (f_vence - hoy).days
-            detalles.append(f"📅 {f_vence.strftime('%d/%m/%Y')}")
-
-            if dias <= 0:
-                estado = "critico"
-            elif dias <= 30:
-                estado = "warning"
-
-        if tipo in ["Horas", "Mixto"] and pd.notnull(h_vence):
-
-            restantes = h_vence - HORAS_ACTUALES_AVION
-            detalles.append(f"⏱️ {int(restantes)}h remaining")
-
-            if restantes <= 0:
-                estado = "critico"
-            elif restantes <= 25:
-                estado = "warning"
-
-        texto = f"{item} — " + " | ".join(detalles)
-
-        if estado == "warning":
-            st.warning(f"🟡 {texto}")
-            hay_warning = True
-
-    if not hay_warning:
+    if warning_list:
+        for i in warning_list:
+            st.warning(i)
+    else:
         st.success("No warnings")
 
     st.divider()
 
     # ======================================================
-    # 🟢 4. NOMINAL STATUS
+    # 🟢 4. NOMINAL SYSTEMS
     # ======================================================
 
-    st.subheader("🟢 4. Nominal Status")
+    st.subheader("🟢 Nominal Systems")
 
-    for _, fila in df_avion.iterrows():
-
-        item = fila["Item"]
-        tipo = fila["Tipo Vencimiento"]
-        f_vence = fila["Fecha Vence"]
-        h_vence = fila["Horas Vence"]
-
-        estado = "ok"
-        detalles = []
-
-        if tipo in ["Fecha", "Mixto"] and pd.notnull(f_vence):
-
-            dias = (f_vence - hoy).days
-            detalles.append(f"📅 {f_vence.strftime('%d/%m/%Y')}")
-
-            if dias <= 0:
-                estado = "critico"
-            elif dias <= 30:
-                estado = "warning"
-
-        if tipo in ["Horas", "Mixto"] and pd.notnull(h_vence):
-
-            restantes = h_vence - HORAS_ACTUALES_AVION
-            detalles.append(f"⏱️ {int(restantes)}h remaining")
-
-            if restantes <= 0:
-                estado = "critico"
-            elif restantes <= 25:
-                estado = "warning"
-
-        texto = f"{item} — " + " | ".join(detalles)
-
-        if estado == "ok":
-            st.success(f"🟢 {texto}")
+    if ok_list:
+        for i in ok_list:
+            st.success(i)
