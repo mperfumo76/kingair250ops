@@ -335,7 +335,7 @@ elif menu == "👨‍✈️ Pilotos":
                     st.warning(f"🟡 {documento} • {dias} days left")
 
                 else:
-                    st.success(f"🟢 {documento} • OK"
+                    st.success(f"🟢 {documento} • OK")
 
 
 # ======================================================
