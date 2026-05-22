@@ -456,42 +456,40 @@ elif menu == "✈️ Aeronave":
 
     def render_event(e):
 
-          colors = {
-             "OVERDUE": "#ff4b4b",
-             "DUE SOON": "#ffa500",
-             "OK": "#2ecc71"
-          }
+        colors = {
+            "OVERDUE": "#ff4b4b",
+            "DUE SOON": "#ffa500",
+            "OK": "#2ecc71"
+        }
 
-    st.markdown(
-        f"""
-        <div style="
-            background:#0e1117;
-            border-left:6px solid {colors[e['estado']]};
-            padding:12px;
-            border-radius:10px;
-            margin-bottom:10px;
-        ">
+        st.markdown(
+            f"""
+            <div style="
+                background:#0e1117;
+                border-left:6px solid {colors[e['estado']]};
+                padding:12px;
+                border-radius:10px;
+                margin-bottom:8px;
+            ">
+                <div style="font-weight:700;">
+                    {e['item']}
+                </div>
 
-            <div style="font-size:15px; font-weight:600;">
-                {e['item']}
+                <div style="font-size:12px; opacity:0.7;">
+                    SYSTEM: {e['sistema']} | STATUS: {e['estado']}
+                </div>
+
+                <div style="font-size:12px; margin-top:4px;">
+                    ACTION: {e['accion']}
+                </div>
+
+                <div style="font-size:11px; opacity:0.6;">
+                    {e['detalle']}
+                </div>
             </div>
-
-            <div style="font-size:12px; opacity:0.75; margin-top:4px;">
-                🧩 System: <b>{e['sistema']}</b>
-            </div>
-
-            <div style="font-size:12px; margin-top:4px;">
-                📌 Status: <b>{e['estado']}</b> | ⚙️ Action: <b>{e['accion']}</b>
-            </div>
-
-            <div style="font-size:11px; opacity:0.6; margin-top:6px;">
-                {e['detalle']}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+            """,
+            unsafe_allow_html=True
+        )
 
     # ======================================================
     # 6. DISPLAY
