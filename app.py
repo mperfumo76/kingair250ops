@@ -307,7 +307,7 @@ if menu == "🏠 Dashboard":
 elif menu == "👨‍✈️ Pilotos":
 
     st.title("👨‍✈️ Crew Management")
-    st.subheader("Vencimientos de tripulación")
+    st.caption("Licenses & Training Status")
 
     lista_pilotos = df_pilotos["Piloto"].unique()
 
@@ -323,19 +323,19 @@ elif menu == "👨‍✈️ Pilotos":
                 vence = fila["Vencimiento"]
 
                 if pd.isnull(vence):
-                    st.info(f"{documento} → Sin fecha")
+                    st.info(f"🟡 {documento} • No expiration date")
                     continue
 
                 dias = (vence - hoy).days
 
                 if dias <= 0:
-                    st.error(f"{documento} → VENCIDO")
+                    st.error(f"🔴 {documento} • EXPIRED")
 
                 elif dias <= 30:
-                    st.warning(f"{documento} → {dias} días")
+                    st.warning(f"🟡 {documento} • {dias} days left")
 
                 else:
-                    st.success(f"{documento} → OK")
+                    st.success(f"🟢 {documento} • OK"
 
 
 # ======================================================
