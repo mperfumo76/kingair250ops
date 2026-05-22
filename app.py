@@ -265,16 +265,19 @@ for _, fila in df_avion.iterrows():
 # METRICAS
 # ======================================================
 
-c1, c2, c3, c4 = st.columns(4)
+if menu == "🏠 Dashboard":
 
-c1.metric("✈️ Aeronave", "King Air 250")
-c2.metric("⏱️ Horas", f"{HORAS_ACTUALES_AVION:.1f}")
-c3.metric("🔴 Críticos", criticos)
-c4.metric("🟢 Vigentes", vigentes)
+    c1, c2, c3, c4 = st.columns(4)
 
-st.caption(f"Fuente: {fuente}")
+    c1.metric("✈️ Aeronave", "King Air 250")
+    c2.metric("⏱️ Horas", f"{HORAS_ACTUALES_AVION:.1f}")
+    c3.metric("🔴 Críticos", criticos)
+    c4.metric("🟢 Vigentes", vigentes)
 
-st.divider()
+    st.divider()
+
+    st.subheader("📊 Resumen Operacional")
+    st.info("Estado general del sistema aeronáutico")
 
 # ======================================================
 # TABS
