@@ -344,27 +344,23 @@ elif menu == "👨‍✈️ Pilotos":
 
 elif menu == "✈️ Aeronave":
 
-    st.title("✈️ Maintenance Control System (MCS)")
-    st.caption("AMOS / TRAX-style Operational View - King Air 250")
-
-    # ======================================================
-    # 1. KPIs OPERACIONALES (AIRLINE STYLE)
-    # ======================================================
+    st.title("✈️ Aircraft Maintenance Control Center")
+    st.caption("King Air 250 • Airline Operations System")
 
     col1, col2, col3, col4 = st.columns(4)
 
     col1.metric("Aircraft", "King Air 250")
     col2.metric("Total Hours", f"{HORAS_ACTUALES_AVION:.1f}")
-    col3.metric("Overdue", criticos)
-    col4.metric("Due Soon", advertencias)
+    col3.metric("Critical", criticos)
+    col4.metric("Warnings", advertencias)
 
     st.divider()
 
     # ======================================================
-    # 2. BUILD EVENT LIST (AMOS CONCEPT)
+    # 1. BUILD MASTER DATASET
     # ======================================================
 
-    eventos = []
+    items = []
 
     for _, fila in df_avion.iterrows():
 
@@ -373,118 +369,110 @@ elif menu == "✈️ Aeronave":
         f_vence = fila["Fecha Vence"]
         h_vence = fila["Horas Vence"]
 
-        sistema = fila["Sistema"] if "Sistema" in df_avion.columns else "GENERAL"
+        sistema = fila["Sistema"] if "Sistema" in df_avion.columns else "General"
 
-        estado = "OK"
-        accion = "MONITOR"
-        dias = None
-        horas_restantes = None
+        estado = "ok"
+        detalle = []
 
-        # =========================
-        # DATE LOGIC
-        # =========================
+        # Fecha logic
         if tipo in ["Fecha", "Mixto"] and pd.notnull(f_vence):
 
             dias = (f_vence - hoy).days
+            detalle.append(f"📅 {f_vence.strftime('%d/%m/%Y')}")
 
             if dias <= 0:
-                estado = "OVERDUE"
-                accion = "IMMEDIATE ACTION"
+                estado = "critico"
             elif dias <= 30:
-                estado = "DUE SOON"
-                accion = "SCHEDULE"
-            else:
-                estado = "OK"
+                estado = "warning"
 
-        # =========================
-        # HOURS LOGIC
-        # =========================
+        # Hours logic
         if tipo in ["Horas", "Mixto"] and pd.notnull(h_vence):
 
-            horas_restantes = h_vence - HORAS_ACTUALES_AVION
+            restantes = h_vence - HORAS_ACTUALES_AVION
+            detalle.append(f"⏱️ {int(restantes)}h remaining")
 
-            if horas_restantes <= 0:
-                estado = "OVERDUE"
-                accion = "IMMEDIATE ACTION"
-            elif horas_restantes <= 25:
-                estado = "DUE SOON"
-                accion = "SCHEDULE"
-            else:
-                estado = "OK"
+            if restantes <= 0:
+                estado = "critico"
+            elif restantes <= 25:
+                estado = "warning"
 
-        eventos.append({
+        items.append({
             "item": item,
             "sistema": sistema,
             "estado": estado,
-            "accion": accion,
-            "detalle": f"📅 {f_vence if f_vence else '-'} | ⏱️ {horas_restantes if horas_restantes else '-'}"
+            "detalle": " • ".join(detalle)
         })
 
     # ======================================================
-    # 3. FILTERS (AMOS STYLE)
+    # 2. SORT (AIRLINE PRIORITY LOGIC)
+    # ======================================================
+
+    priority = {"critico": 0, "warning": 1, "ok": 2}
+    items = sorted(items, key=lambda x: priority[x["estado"]])
+
+    # ======================================================
+    # 3. FILTER BAR (AIRLINE STYLE CONTROL)
     # ======================================================
 
     filtro = st.radio(
-        "Maintenance View",
-        ["ALL EVENTS", "OVERDUE", "DUE SOON", "OK"],
+        "View",
+        ["All", "Critical", "Warning", "Nominal"],
         horizontal=True
     )
 
-    def show(e):
-
-        if filtro == "ALL EVENTS":
+    def show(item):
+        if filtro == "All":
             return True
-        if filtro == "OVERDUE":
-            return e["estado"] == "OVERDUE"
-        if filtro == "DUE SOON":
-            return e["estado"] == "DUE SOON"
-        if filtro == "OK":
-            return e["estado"] == "OK"
-
+        if filtro == "Critical":
+            return item["estado"] == "critico"
+        if filtro == "Warning":
+            return item["estado"] == "warning"
+        if filtro == "Nominal":
+            return item["estado"] == "ok"
         return True
 
     # ======================================================
-    # 4. SORT (MRO PRIORITY ENGINE)
+    # 4. GROUP BY SYSTEM (AIRLINE STYLE)
     # ======================================================
 
-    priority = {"OVERDUE": 0, "DUE SOON": 1, "OK": 2}
-    eventos = sorted(eventos, key=lambda x: priority[x["estado"]])
+    sistemas = {}
+
+    for i in items:
+        if show(i):
+            sistemas.setdefault(i["sistema"], []).append(i)
 
     # ======================================================
-    # 5. RENDER (AMOS / TRAX CARD STYLE)
+    # 5. RENDER (AIRLINE DISPATCH STYLE)
     # ======================================================
 
-    def render_event(e):
+    def render_card(title, detail, state):
 
         colors = {
-            "OVERDUE": "#ff4b4b",
-            "DUE SOON": "#ffa500",
-            "OK": "#2ecc71"
+            "critico": "#ff4b4b",
+            "warning": "#ffa500",
+            "ok": "#2ecc71"
+        }
+
+        icons = {
+            "critico": "🔴",
+            "warning": "🟡",
+            "ok": "🟢"
         }
 
         st.markdown(
             f"""
             <div style="
                 background:#0e1117;
-                border-left:6px solid {colors[e['estado']]};
+                border-left:5px solid {colors[state]};
                 padding:12px;
                 border-radius:10px;
                 margin-bottom:8px;
             ">
-                <div style="font-weight:700;">
-                    {e['item']}
+                <div style="font-weight:600; font-size:14px;">
+                    {icons[state]} {title}
                 </div>
-
                 <div style="font-size:12px; opacity:0.7;">
-                    SYSTEM: {e['sistema']} | STATUS: {e['estado']}
-                </div>
-
-                <div style="font-size:12px; margin-top:4px;">
-                    ACTION: {e['accion']}
-                </div>
-
-                <div style="font-size:11px; opacity:0.6;">
-                    {e['detalle']}
+                    {detail}
                 </div>
             </div>
             """,
@@ -492,9 +480,12 @@ elif menu == "✈️ Aeronave":
         )
 
     # ======================================================
-    # 6. DISPLAY
+    # 6. DISPLAY BY SYSTEM (REAL AIRLINE STRUCTURE)
     # ======================================================
 
-    for e in eventos:
-        if show(e):
-            render_event(e)
+    for sistema, lista in sistemas.items():
+
+        st.subheader(f"🧩 {sistema}")
+
+        for i in lista:
+            render_card(i["item"], i["detalle"], i["estado"])
