@@ -337,24 +337,18 @@ elif menu == "👨‍✈️ Pilotos":
 elif menu == "✈️ Aeronave":
 
     st.title("✈️ Aircraft Systems")
-    st.caption("King Air 250 - Operational Status")
+    st.caption("King Air 250 - Operational Cockpit View")
 
     col1, col2, col3 = st.columns(3)
 
-    with col1:
-        st.metric("✈️ Aeronave", "King Air 250")
-
-    with col2:
-        st.metric("⏱️ Horas Totales", f"{HORAS_ACTUALES_AVION:.1f}")
-
-    with col3:
-        st.metric("🔴 Ítems críticos", criticos)
+    col1.metric("✈️ Aeronave", "King Air 250")
+    col2.metric("⏱️ Horas Totales", f"{HORAS_ACTUALES_AVION:.1f}")
+    col3.metric("🔴 Críticos", criticos)
 
     st.divider()
 
-    st.subheader("🧭 System Status Overview")
+    st.subheader("🧭 System Status")
 
-    # Separación visual por estado
     criticos_list = []
     warning_list = []
     ok_list = []
@@ -369,6 +363,9 @@ elif menu == "✈️ Aeronave":
         estado = "ok"
         detalles = []
 
+        # =========================
+        # CONTROL POR FECHA
+        # =========================
         if tipo in ["Fecha", "Mixto"] and pd.notnull(f_vence):
 
             dias = (f_vence - hoy).days
@@ -379,6 +376,9 @@ elif menu == "✈️ Aeronave":
             elif dias <= 30 and estado != "critico":
                 estado = "warning"
 
+        # =========================
+        # CONTROL POR HORAS
+        # =========================
         if tipo in ["Horas", "Mixto"] and pd.notnull(h_vence):
 
             restantes = h_vence - HORAS_ACTUALES_AVION
@@ -391,33 +391,38 @@ elif menu == "✈️ Aeronave":
 
         texto = f"{item} — " + " | ".join(detalles)
 
+        # =========================
+        # CLASIFICACIÓN FINAL
+        # =========================
         if estado == "critico":
             criticos_list.append(texto)
+
         elif estado == "warning":
             warning_list.append(texto)
+
         else:
             ok_list.append(texto)
 
     # =========================
-    # CRÍTICOS
+    # BLOQUE 1: CRÍTICOS
     # =========================
     if criticos_list:
-        st.error("🔴 CRÍTICOS")
-        for i in criticos_list:
-            st.write(i)
+        st.error("🔴 CRITICAL SYSTEMS")
+        for item in criticos_list:
+            st.write(item)
 
     # =========================
-    # WARNING
+    # BLOQUE 2: WARNING
     # =========================
     if warning_list:
-        st.warning("🟡 PRÓXIMOS A VENCER")
-        for i in warning_list:
-            st.write(i)
+        st.warning("🟡 ATTENTION REQUIRED")
+        for item in warning_list:
+            st.write(item)
 
     # =========================
-    # OK
+    # BLOQUE 3: OK
     # =========================
     if ok_list:
-        st.success("🟢 EN ESTADO OK")
-        for i in ok_list:
-            st.write(i)
+        st.success("🟢 NOMINAL STATUS")
+        for item in ok_list:
+            st.write(item)
