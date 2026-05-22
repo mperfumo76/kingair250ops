@@ -344,19 +344,20 @@ elif menu == "👨‍✈️ Pilotos":
 
 elif menu == "✈️ Aeronave":
 
-    st.title("✈️ Aircraft Systems")
-    st.caption("King Air 250 • Operational Intelligence Platform")
+    st.title("✈️ Aircraft Maintenance Control Center")
+    st.caption("King Air 250 • Airline Operations System")
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
 
     col1.metric("Aircraft", "King Air 250")
     col2.metric("Total Hours", f"{HORAS_ACTUALES_AVION:.1f}")
-    col3.metric("Critical Items", criticos)
+    col3.metric("Critical", criticos)
+    col4.metric("Warnings", advertencias)
 
     st.divider()
 
     # ======================================================
-    # 1. DATA PROCESSING (MEJORADO)
+    # 1. BUILD MASTER DATASET
     # ======================================================
 
     items = []
@@ -368,25 +369,27 @@ elif menu == "✈️ Aeronave":
         f_vence = fila["Fecha Vence"]
         h_vence = fila["Horas Vence"]
 
-        estado = "ok"
-        detalles = []
+        sistema = fila["Sistema"] if "Sistema" in df_avion.columns else "General"
 
-        # Fecha
+        estado = "ok"
+        detalle = []
+
+        # Fecha logic
         if tipo in ["Fecha", "Mixto"] and pd.notnull(f_vence):
 
             dias = (f_vence - hoy).days
-            detalles.append(f"📅 {f_vence.strftime('%d/%m/%Y')}")
+            detalle.append(f"📅 {f_vence.strftime('%d/%m/%Y')}")
 
             if dias <= 0:
                 estado = "critico"
             elif dias <= 30:
                 estado = "warning"
 
-        # Horas
+        # Hours logic
         if tipo in ["Horas", "Mixto"] and pd.notnull(h_vence):
 
             restantes = h_vence - HORAS_ACTUALES_AVION
-            detalles.append(f"⏱️ {int(restantes)}h remaining")
+            detalle.append(f"⏱️ {int(restantes)}h remaining")
 
             if restantes <= 0:
                 estado = "critico"
@@ -395,45 +398,80 @@ elif menu == "✈️ Aeronave":
 
         items.append({
             "item": item,
+            "sistema": sistema,
             "estado": estado,
-            "detalle": " • ".join(detalles)
+            "detalle": " • ".join(detalle)
         })
 
     # ======================================================
-    # 2. ORDER BY PRIORITY (CLAVE PRODUCTO)
+    # 2. SORT (AIRLINE PRIORITY LOGIC)
     # ======================================================
 
-    orden = {"critico": 0, "warning": 1, "ok": 2}
-    items = sorted(items, key=lambda x: orden[x["estado"]])
+    priority = {"critico": 0, "warning": 1, "ok": 2}
+    items = sorted(items, key=lambda x: priority[x["estado"]])
 
     # ======================================================
-    # 3. CARD SYSTEM (UI PREMIUM REAL)
+    # 3. FILTER BAR (AIRLINE STYLE CONTROL)
     # ======================================================
 
-    def card(title, detail, state):
+    filtro = st.radio(
+        "View",
+        ["All", "Critical", "Warning", "Nominal"],
+        horizontal=True
+    )
 
-        style_map = {
-            "critico": ("#ff4b4b", "🔴"),
-            "warning": ("#ffa500", "🟡"),
-            "ok": ("#2ecc71", "🟢")
+    def show(item):
+        if filtro == "All":
+            return True
+        if filtro == "Critical":
+            return item["estado"] == "critico"
+        if filtro == "Warning":
+            return item["estado"] == "warning"
+        if filtro == "Nominal":
+            return item["estado"] == "ok"
+        return True
+
+    # ======================================================
+    # 4. GROUP BY SYSTEM (AIRLINE STYLE)
+    # ======================================================
+
+    sistemas = {}
+
+    for i in items:
+        if show(i):
+            sistemas.setdefault(i["sistema"], []).append(i)
+
+    # ======================================================
+    # 5. RENDER (AIRLINE DISPATCH STYLE)
+    # ======================================================
+
+    def render_card(title, detail, state):
+
+        colors = {
+            "critico": "#ff4b4b",
+            "warning": "#ffa500",
+            "ok": "#2ecc71"
         }
 
-        color, icon = style_map[state]
+        icons = {
+            "critico": "🔴",
+            "warning": "🟡",
+            "ok": "🟢"
+        }
 
         st.markdown(
             f"""
             <div style="
                 background:#0e1117;
-                border:1px solid {color};
-                border-radius:12px;
-                padding:12px 14px;
-                margin-bottom:10px;
-                box-shadow:0px 0px 10px rgba(0,0,0,0.3);
+                border-left:5px solid {colors[state]};
+                padding:12px;
+                border-radius:10px;
+                margin-bottom:8px;
             ">
-                <div style="font-size:15px; font-weight:600; color:white;">
-                    {icon} {title}
+                <div style="font-weight:600; font-size:14px;">
+                    {icons[state]} {title}
                 </div>
-                <div style="font-size:12px; opacity:0.7; margin-top:4px;">
+                <div style="font-size:12px; opacity:0.7;">
                     {detail}
                 </div>
             </div>
@@ -442,47 +480,12 @@ elif menu == "✈️ Aeronave":
         )
 
     # ======================================================
-    # 4. CRITICAL FIRST (UX REAL)
+    # 6. DISPLAY BY SYSTEM (REAL AIRLINE STRUCTURE)
     # ======================================================
 
-    st.subheader("🔴 Critical Systems")
+    for sistema, lista in sistemas.items():
 
-    crit_found = False
-    for i in items:
-        if i["estado"] == "critico":
-            card(i["item"], i["detalle"], i["estado"])
-            crit_found = True
+        st.subheader(f"🧩 {sistema}")
 
-    if not crit_found:
-        st.success("No critical systems")
-
-    st.divider()
-
-    # ======================================================
-    # 5. WARNING
-    # ======================================================
-
-    st.subheader("🟡 Attention Required")
-
-    warn_found = False
-    for i in items:
-        if i["estado"] == "warning":
-            card(i["item"], i["detalle"], i["estado"])
-            warn_found = True
-
-    if not warn_found:
-        st.success("No warnings")
-
-    st.divider()
-
-    # ======================================================
-    # 6. NOMINAL
-    # ======================================================
-
-    st.subheader("🟢 Nominal Systems")
-
-    ok_found = False
-    for i in items:
-        if i["estado"] == "ok":
-            card(i["item"], i["detalle"], i["estado"])
-            ok_found = True
+        for i in lista:
+            render_card(i["item"], i["detalle"], i["estado"])
