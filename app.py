@@ -280,19 +280,12 @@ if menu == "🏠 Dashboard":
     st.info("Estado general del sistema aeronáutico")
 
 # ======================================================
-# TABS
+# 👨‍✈️ PILOTOS
 # ======================================================
 
-tab1, tab2 = st.tabs([
-    "👨‍✈️ Tripulación",
-    "🛩️ Mantenimiento"
-])
+elif menu == "👨‍✈️ Pilotos":
 
-# ======================================================
-# PILOTOS
-# ======================================================
-
-with tab1:
+    st.title("👨‍✈️ Tripulación")
 
     lista_pilotos = df_pilotos["Piloto"].unique()
 
@@ -300,44 +293,27 @@ with tab1:
 
         with st.expander(f"👨‍✈️ {piloto}"):
 
-            datos = df_pilotos[
-                df_pilotos["Piloto"] == piloto
-            ]
+            datos = df_pilotos[df_pilotos["Piloto"] == piloto]
 
             for _, fila in datos.iterrows():
 
                 documento = fila["Documento/Curso"]
-
                 vence = fila["Vencimiento"]
 
                 if pd.isnull(vence):
-
                     st.info(f"{documento} → Sin fecha")
-
                     continue
 
                 dias = (vence - hoy).days
 
                 if dias <= 0:
-
-                    st.error(
-                        f"{documento} → "
-                        f"VENCIDO"
-                    )
+                    st.error(f"{documento} → VENCIDO")
 
                 elif dias <= 30:
-
-                    st.warning(
-                        f"{documento} → "
-                        f"{dias} días"
-                    )
+                    st.warning(f"{documento} → {dias} días")
 
                 else:
-
-                    st.success(
-                        f"{documento} → OK"
-                    )
-
+                    st.success(f"{documento} → OK")
 # ======================================================
 # AVION
 # ======================================================
