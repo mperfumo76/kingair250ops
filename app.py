@@ -342,35 +342,7 @@ elif menu == "👨‍✈️ Pilotos":
 # 3. AERONAVE
 # ======================================================
 
-[5:31 p.m., 22/5/2026] Tincho: elif menu == "✈️ Aeronave":
-
-    st.title("✈️ Aircraft Maintenance Control Center")
-    st.caption("King Air 250 • Airline Operations System")
-
-    col1, col2, col3, col4 = st.columns(4)
-
-    col1.metric("Aircraft", "King Air 250")
-    col2.metric("Total Hours", f"{HORAS_ACTUALES_AVION:.1f}")
-    col3.metric("Critical", criticos)
-    col4.metric("Warnings", advertencias)
-
-    st.divider()
-
-    # ======================================================
-    # 1. BUILD MASTER DATASET
-    # ======================================================
-
-    items = []
-
-    for _, fila in df_avion.iterrows():
-
-        item = fila["Item"]
-        tipo = fila["Tipo Vencimiento"]
-        f_vence = fila["Fecha Vence"]
-        h_vence = fila["Horas Vence"]
-
-        sistema = fi…
-[5:34 p.m., 22/5/2026] Tincho: elif menu == "✈️ Aeronave":
+elif menu == "✈️ Aeronave":
 
     st.title("✈️ Maintenance Control System (MCS)")
     st.caption("AMOS / TRAX-style Operational View - King Air 250")
