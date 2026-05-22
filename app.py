@@ -36,6 +36,11 @@ with open("style.css") as f:
 st.title("✈️ King Air 250 Ops")
 st.caption("Control Operacional y Vencimientos")
 
+menu = st.sidebar.radio(
+    "📌 MENÚ",
+    ["🏠 Dashboard", "✈️ Aeronave", "👨‍✈️ Pilotos", "🛩️ Mantenimiento"]
+)
+
 st.divider()
 
 # ======================================================
