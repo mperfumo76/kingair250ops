@@ -342,7 +342,7 @@ elif menu == "👨‍✈️ Pilotos":
 # 3. AERONAVE
 # ======================================================
 
-elif menu == "✈️ Aeronave":
+[5:24 p.m., 22/5/2026] Tincho: lif menu == "✈️ Aeronave":
 
     st.title("✈️ Aircraft Systems")
     st.caption("Operational Cockpit View - King Air 250")
@@ -362,6 +362,33 @@ elif menu == "✈️ Aeronave":
     criticos_list = []
     warning_list = []
     ok_list = []
+
+    for _, fila in df_avion.iterrows():
+
+        item = fila["Item"]
+        tipo = fila["Tipo Vencimiento"]
+        f_vence = fila["Fecha Vence"]
+        h_vence = fila["Horas Vence"]
+
+        estado = "o…
+[5:27 p.m., 22/5/2026] Tincho: elif menu == "✈️ Aeronave":
+
+    st.title("✈️ Aircraft Systems")
+    st.caption("King Air 250 • Premium Operations Dashboard")
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Aircraft", "King Air 250")
+    col2.metric("Total Hours", f"{HORAS_ACTUALES_AVION:.1f}")
+    col3.metric("Critical Items", criticos)
+
+    st.divider()
+
+    # ======================================================
+    # DATA PROCESSING (UN SOLO LOOP)
+    # ======================================================
+
+    items = []
 
     for _, fila in df_avion.iterrows():
 
@@ -393,51 +420,80 @@ elif menu == "✈️ Aeronave":
             elif restantes <= 25:
                 estado = "warning"
 
-        texto = f"{item} — " + " | ".join(detalles)
-
-        if estado == "critico":
-            criticos_list.append(texto)
-
-        elif estado == "warning":
-            warning_list.append(texto)
-
-        else:
-            ok_list.append(texto)
+        items.append({
+            "item": item,
+            "estado": estado,
+            "detalle": " • ".join(detalles)
+        })
 
     # ======================================================
-    # 🔴 2. CRITICAL SYSTEMS
+    # PREMIUM UI RENDER
+    # ======================================================
+
+    def render_card(title, detail, state):
+
+        color_map = {
+            "critico": "🔴",
+            "warning": "🟡",
+            "ok": "🟢"
+        }
+
+        icon = color_map.get(state, "⚪")
+
+        st.markdown(
+            f"""
+            <div style="
+                padding:12px;
+                border-radius:12px;
+                border:1px solid #333;
+                margin-bottom:8px;
+                background-color:#111;
+            ">
+                <div style="font-size:16px; font-weight:600;">
+                    {icon} {title}
+                </div>
+                <div style="font-size:13px; opacity:0.8;">
+                    {detail}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    # ======================================================
+    # SEPARACIÓN VISUAL PREMIUM
     # ======================================================
 
     st.subheader("🔴 Critical Systems")
 
-    if criticos_list:
-        for i in criticos_list:
-            st.error(i)
-    else:
+    critical_found = False
+    for i in items:
+        if i["estado"] == "critico":
+            render_card(i["item"], i["detalle"], i["estado"])
+            critical_found = True
+
+    if not critical_found:
         st.success("No critical systems")
 
     st.divider()
 
-    # ======================================================
-    # 🟡 3. WARNING SYSTEMS
-    # ======================================================
-
     st.subheader("🟡 Warning Systems")
 
-    if warning_list:
-        for i in warning_list:
-            st.warning(i)
-    else:
+    warning_found = False
+    for i in items:
+        if i["estado"] == "warning":
+            render_card(i["item"], i["detalle"], i["estado"])
+            warning_found = True
+
+    if not warning_found:
         st.success("No warnings")
 
     st.divider()
 
-    # ======================================================
-    # 🟢 4. NOMINAL SYSTEMS
-    # ======================================================
-
     st.subheader("🟢 Nominal Systems")
 
-    if ok_list:
-        for i in ok_list:
-            st.success(i)
+    ok_found = False
+    for i in items:
+        if i["estado"] == "ok":
+            render_card(i["item"], i["detalle"], i["estado"])
+            ok_found = True
