@@ -298,7 +298,8 @@ if menu == "🏠 Dashboard":
 
 elif menu == "👨‍✈️ Pilotos":
 
-    st.title("👨‍✈️ Tripulación")
+    st.title("👨‍✈️ Crew Management")
+    st.subheader("Vencimientos de tripulación")
 
     lista_pilotos = df_pilotos["Piloto"].unique()
 
