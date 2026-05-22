@@ -1,0 +1,22 @@
+.stApp {
+    background-color: #0E1117;
+    color: white;
+}
+
+[data-testid="stMetric"] {
+    background-color: #1c1f26;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #2e3440;
+}
+
+div[data-testid="stExpander"] {
+    background-color: #1c1f26;
+    border-radius: 12px;
+    border: 1px solid #2e3440;
+    margin-bottom: 10px;
+}
+
+h1, h2, h3 {
+    color: white;
+}
